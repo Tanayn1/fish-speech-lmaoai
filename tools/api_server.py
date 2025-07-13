@@ -84,10 +84,10 @@ class API(ExceptionHandler):
             mode=self.args.mode,
             device=self.args.device,
             half=self.args.half,
-            compile=self.args.compile,
-            llama_checkpoint_path=self.args.llama_checkpoint_path,
-            decoder_checkpoint_path=self.args.decoder_checkpoint_path,
-            decoder_config_name=self.args.decoder_config_name,
+            compile=True,
+            llama_checkpoint_path="checkpoints/openaudio-s1-mini",
+            decoder_checkpoint_path="checkpoints/openaudio-s1-mini/codec.pth",
+            decoder_config_name="modded_dac_vq",
         )
 
         logger.info(f"Startup done, listening server at http://{self.args.listen}")
