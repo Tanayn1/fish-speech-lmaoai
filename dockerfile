@@ -3,11 +3,13 @@ ARG TARGETARCH
 
 ARG HUGGINGFACE_MODEL=openaudio-s1-mini
 ARG HF_ENDPOINT=https://huggingface.co
+ENV HF_TOKEN=${HF_TOKEN}
 
 WORKDIR /opt/fish-speech
 
 RUN set -ex \
     && pip install huggingface_hub \
+    && huggingface-cli login --token ${HF_TOKEN} \
     && HF_ENDPOINT=${HF_ENDPOINT} huggingface-cli download --resume-download fishaudio/${HUGGINGFACE_MODEL} --local-dir checkpoints/${HUGGINGFACE_MODEL}
 
 FROM python:3.12-slim-bookworm

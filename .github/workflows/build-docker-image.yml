@@ -30,6 +30,8 @@ jobs:
           push: true
           tags: |
             tanay359/public:latest
+          build-args: |
+            HF_TOKEN=${{ secrets.HF_TOKEN }}
           outputs: type=image,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true
           cache-from: type=registry,ref=fishaudio/fish-speech:latest
           cache-to: type=inline
