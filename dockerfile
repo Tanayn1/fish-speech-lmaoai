@@ -47,6 +47,6 @@ COPY --from=stage-1 /opt/fish-speech/checkpoints /opt/fish-speech/checkpoints
 
 ENV GRADIO_SERVER_NAME="0.0.0.0"
 
-EXPOSE 8000
+EXPOSE 8080
 
 CMD [ "python", "-m", "tools.api_server"]
