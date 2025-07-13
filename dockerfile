@@ -1,9 +1,9 @@
 FROM python:3.12-slim-bookworm AS stage-1
 ARG TARGETARCH
 
+ARG HF_TOKEN
 ARG HUGGINGFACE_MODEL=openaudio-s1-mini
 ARG HF_ENDPOINT=https://huggingface.co
-ENV HF_TOKEN=${HF_TOKEN}
 
 WORKDIR /opt/fish-speech
 
