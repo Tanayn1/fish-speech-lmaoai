@@ -29,7 +29,7 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            tanay359/public:latest
+            tanay359/public:latestl
           outputs: type=image,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true
           cache-from: type=registry,ref=fishaudio/fish-speech:latest
           cache-to: type=inline
