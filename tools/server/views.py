@@ -144,7 +144,7 @@ async def tts(req: Annotated[ServeTTSRequest, Body(exclusive=True)]):
             content_type=get_content_type(req.format),
         )
 
-@routes.http.post('v1/tts/vapi/{voice_id}')
+@routes.http.post('/v1/tts/vapi/{voice_id}')
 async def ttsVapi(req: Annotated[VapiTTSRequest, Body(exclusive=True)]):
     voice_id = request.params["voice_id"]
     print("voice_id", voice_id)
