@@ -103,3 +103,32 @@ class ServeTTSRequest(BaseModel):
     class Config:
         # Allow arbitrary types for pytorch related types
         arbitrary_types_allowed = True
+    
+
+class Call(BaseModel):
+    id: str
+    orgId: str
+
+class Customer(BaseModel):
+    number: str
+
+class Assistant(BaseModel):
+    id: str
+    name: str
+
+class Message(BaseModel):
+    type: str
+    text: str
+    sampleRate: int
+    timestamp: int
+    call: Call
+    assistant: Assistant
+    customer: Customer
+
+class VapiTTSRequest(BaseModel):
+    message: Message
+
+
+
+
+
