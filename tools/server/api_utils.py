@@ -9,6 +9,8 @@ from kui.asgi import HTTPException, HttpRequest
 from fish_speech.inference_engine import TTSInferenceEngine
 from fish_speech.utils.schema import ServeTTSRequest
 from tools.server.inference import inference_wrapper as inference
+from tools.server.inference import vapi_inference_wrapper
+
 
 
 def parse_args():
@@ -56,6 +58,11 @@ class MsgPackRequest(HttpRequest):
 
 async def inference_async(req: ServeTTSRequest, engine: TTSInferenceEngine):
     for chunk in inference(req, engine):
+        if isinstance(chunk, bytes):
+            yield chunk
+
+async def inference_async_vapi(req: ServeTTSRequest, engine: TTSInferenceEngine, sample_rate: int):
+    for chunk in vapi_inference_wrapper(req, engine, sample_rate):
         if isinstance(chunk, bytes):
             yield chunk
 
