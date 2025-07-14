@@ -21,6 +21,7 @@ from typing_extensions import Annotated
 
 from fish_speech.utils.schema import (
     ServeTTSRequest,
+    VapiTTSRequest,
     ServeVQGANDecodeRequest,
     ServeVQGANDecodeResponse,
     ServeVQGANEncodeRequest,
@@ -32,6 +33,8 @@ from tools.server.api_utils import (
     inference_async,
 )
 from tools.server.inference import inference_wrapper as inference
+from tools.server.inference import vapi_inference_wrapper
+
 from tools.server.model_manager import ModelManager
 from tools.server.model_utils import (
     batch_vqgan_decode,
@@ -140,3 +143,26 @@ async def tts(req: Annotated[ServeTTSRequest, Body(exclusive=True)]):
             },
             content_type=get_content_type(req.format),
         )
+
+@routes.http.post('v1/tts/vapi/{voice_id}')
+async def ttsVapi(req: Annotated[VapiTTSRequest, Body(exclusive=True)]):
+    voice_id = request.params["voice_id"]
+    print("voice_id", voice_id)
+    app_state = request.app.state
+    model_manager: ModelManager = app_state.model_manager
+    engine = model_manager.tts_inference_engine
+
+    ttsRequest = ServeTTSRequest(text=req, format="pcm", streaming=True)
+
+
+    return StreamResponse(
+        iterable=vapi_inference_wrapper(ttsRequest, engine, req.message.sampleRate),
+        headers={
+            "Content-Disposition": f"attachment; filename=audio.pcm",
+        },
+        content_type="application/octet-stream",
+    )
+
+    
+
+    
