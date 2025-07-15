@@ -18,6 +18,8 @@ from kui.asgi import (
 )
 from loguru import logger
 from typing_extensions import Annotated
+from kui.asgi.params import Path
+
 
 from fish_speech.utils.schema import (
     ServeTTSRequest,
@@ -145,7 +147,10 @@ async def tts(req: Annotated[ServeTTSRequest, Body(exclusive=True)]):
         )
 
 @routes.http.post('/v1/tts/vapi/{voice_id}')
-async def ttsVapi(req: Annotated[VapiTTSRequest, Body(exclusive=True)]):
+async def ttsVapi(
+    req: Annotated[VapiTTSRequest, Body(exclusive=True)],
+    voice_id: Annotated[str, Path()]
+):
     voice_id = request.params["voice_id"]
     print("voice_id", voice_id)
     app_state = request.app.state
