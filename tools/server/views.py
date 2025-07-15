@@ -157,6 +157,8 @@ async def ttsVapi(
     model_manager: ModelManager = app_state.model_manager
     engine = model_manager.tts_inference_engine
 
+    print(f"Generating audio for {req.message.text}")
+
     ttsRequest = ServeTTSRequest(text=req.message.text, format="pcm", streaming=True)
 
 

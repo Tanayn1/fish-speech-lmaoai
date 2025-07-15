@@ -61,9 +61,9 @@ def vapi_inference_wrapper(req: ServeTTSRequest, engine: TTSInferenceEngine, sam
     count = 0
     for result in engine.inference(req):
         match result.code:
-            case "header":
-                if isinstance(result.audio, tuple):
-                    yield result.audio[1]
+            # case "header":
+            #     if isinstance(result.audio, tuple):
+            #         yield result.audio[1]
 
             case "error":
                 raise HTTPException(
