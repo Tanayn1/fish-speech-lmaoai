@@ -33,9 +33,9 @@ from tools.server.api_utils import (
     buffer_to_async_generator,
     get_content_type,
     inference_async,
+    inference_async_vapi
 )
 from tools.server.inference import inference_wrapper as inference
-from tools.server.inference import vapi_inference_wrapper
 
 from tools.server.model_manager import ModelManager
 from tools.server.model_utils import (
@@ -161,7 +161,7 @@ async def ttsVapi(
 
 
     return StreamResponse(
-        iterable=vapi_inference_wrapper(ttsRequest, engine, req.message.sampleRate),
+        iterable=inference_async_vapi(ttsRequest, engine, req.message.sampleRate),
         headers={
             "Content-Disposition": f"attachment; filename=audio.pcm",
         },
