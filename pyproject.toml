@@ -44,7 +44,8 @@ dependencies = [
     "pydantic==2.9.2",
     "cachetools",
     "descript-audio-codec",
-    "descript-audiotools"
+    "descript-audiotools",
+    "asyncpg"
 ]
 
 [project.optional-dependencies]
