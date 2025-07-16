@@ -24,6 +24,7 @@ from tools.server.api_utils import MsgPackRequest, parse_args
 from tools.server.exception_handler import ExceptionHandler
 from tools.server.model_manager import ModelManager
 from tools.server.views import routes
+from tools.server.db import connect, disconnect
 
 
 class API(ExceptionHandler):
@@ -77,9 +78,11 @@ class API(ExceptionHandler):
 
         # Associate the app with the model manager
         self.app.on_startup(self.initialize_app)
+        self.app.on_shutdown(disconnect)
 
     async def initialize_app(self, app: Kui):
         # Make the ModelManager available to the views
+        await connect()
         app.state.model_manager = ModelManager(
             mode=self.args.mode,
             device=self.args.device,
