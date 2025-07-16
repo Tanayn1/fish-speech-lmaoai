@@ -2,7 +2,7 @@ import base64
 import os
 import queue
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Optional
 
 import torch
 from pydantic import BaseModel, Field, conint, model_validator
@@ -128,6 +128,19 @@ class Message(BaseModel):
 class VapiTTSRequest(BaseModel):
     message: Message
 
+
+class Voice(BaseModel):
+    id: str
+    vapiId: Optional[str] = None
+    provider: str
+    name: str
+    accent: Optional[str] = None
+    gender: str
+    image: Optional[str] = None
+    uri: Optional[str] = None
+    transcription: Optional[str] = None
+    deepfake: Optional[bool] = False
+    slug: str
 
 
 
