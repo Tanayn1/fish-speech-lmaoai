@@ -73,14 +73,17 @@ def vapi_inference_wrapper(req: ServeTTSRequest, engine: TTSInferenceEngine, sam
 
             case "segment" | "final":
                 count += 1
+                
+                if result.code == "final":
+                    return
+                
                 if isinstance(result.audio, tuple):
                     orig_sr, segment = result.audio
                     segment = resample_audio(segment, orig_sr, sample_rate)
                     segment = (segment * AMPLITUDE).astype(np.int16)
                     yield segment.tobytes()
 
-                if result.code == "final":
-                    return
+
 
     if count == 0:
         raise HTTPException(
