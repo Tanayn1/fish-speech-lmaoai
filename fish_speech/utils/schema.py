@@ -106,24 +106,24 @@ class ServeTTSRequest(BaseModel):
     
 
 class Call(BaseModel):
-    id: str
-    orgId: str
+    id: str | None = None
+    orgId: str | None = None
 
 class Customer(BaseModel):
-    number: str
+    number: str | None = None
 
 class Assistant(BaseModel):
-    id: str
-    name: str
+    id: str | None = None
+    name: str | None = None
 
 class Message(BaseModel):
-    type: str
-    text: str
+    type: str | None = None
+    text: str 
     sampleRate: int
-    timestamp: int
-    call: Call
-    assistant: Assistant
-    customer: Customer
+    timestamp: int | None = None
+    call: Call | None = None
+    assistant: Assistant | None = None
+    customer: Customer | None = None
 
 class VapiTTSRequest(BaseModel):
     message: Message
