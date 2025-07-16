@@ -13,6 +13,7 @@ async def disconnect():
     await conn.close()
 
 async def fetchVoice(id) -> Voice | None:
+    global conn
     row = await conn.fetchrow('SELECT * FROM "Voices" WHERE id = $1', id)
     return Voice(**dict(row)) if row else None
 
