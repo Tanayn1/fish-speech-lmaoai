@@ -23,6 +23,7 @@ from kui.wsgi import Path
 
 from fish_speech.utils.schema import (
     ServeTTSRequest,
+    ServeReferenceAudio,
     VapiTTSRequest,
     ServeVQGANDecodeRequest,
     ServeVQGANDecodeResponse,
@@ -42,6 +43,8 @@ from tools.server.model_utils import (
     batch_vqgan_decode,
     cached_vqgan_batch_encode,
 )
+from tools.server.db import fetchVoice
+import requests
 
 MAX_NUM_SAMPLES = int(os.getenv("NUM_SAMPLES", 1))
 
@@ -154,13 +157,28 @@ async def ttsVapi(
     voice_id = request.path_params["voice_id"]
     print("voice_id", voice_id)
     print("vapi message", req.message)
+
+    print("Fetching Voice")
+
+    voice = await fetchVoice(voice_id)
+    uri = voice.uri if voice and voice.uri else "https://parrot-samples.s3.amazonaws.com/gargamel/Nigel.wav"
+    reference_text = voice.transcription if voice and voice.transcription else "hey hows it going mate i would love to catch up"  
+    print("downloading audio")
+    response = requests.get(uri)
+    print("downloaded audio")
+
+    reference_audio = ServeReferenceAudio(
+        audio=response.content,
+        text=reference_text
+    )
+
     app_state = request.app.state
     model_manager: ModelManager = app_state.model_manager
     engine = model_manager.tts_inference_engine
 
     print(f"Generating audio for {req.message.text}")
 
-    ttsRequest = ServeTTSRequest(text=req.message.text, format="pcm", streaming=True)
+    ttsRequest = ServeTTSRequest(text=req.message.text, format="pcm", streaming=True, references=[reference_audio])
 
 
     return StreamResponse(
