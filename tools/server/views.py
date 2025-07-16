@@ -18,7 +18,7 @@ from kui.asgi import (
 )
 from loguru import logger
 from typing_extensions import Annotated
-# from kui.wsgi import Path
+from kui.wsgi import Path
 
 
 from fish_speech.utils.schema import (
@@ -149,10 +149,11 @@ async def tts(req: Annotated[ServeTTSRequest, Body(exclusive=True)]):
 @routes.http.post('/v1/tts/vapi/{voice_id}')
 async def ttsVapi(
     req: Annotated[VapiTTSRequest, Body(exclusive=True)],
-    # voice_id: Annotated[str, Path()]
+    voice_id: Annotated[str, Path()]
 ):
-    # voice_id = request.path_params["voice_id"]
-    # print("voice_id", voice_id)
+    voice_id = request.path_params["voice_id"]
+    print("voice_id", voice_id)
+    print("vapi message", req.message)
     app_state = request.app.state
     model_manager: ModelManager = app_state.model_manager
     engine = model_manager.tts_inference_engine
