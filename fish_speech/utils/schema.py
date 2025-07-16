@@ -142,6 +142,10 @@ class Voice(BaseModel):
     deepfake: Optional[bool] = False
     slug: str
 
+class CachedAudio(BaseModel):
+    path: str
+    transcription: str
+
 
 
 

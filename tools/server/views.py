@@ -29,6 +29,7 @@ from fish_speech.utils.schema import (
     ServeVQGANDecodeResponse,
     ServeVQGANEncodeRequest,
     ServeVQGANEncodeResponse,
+    CachedAudio
 )
 from tools.server.api_utils import (
     buffer_to_async_generator,
@@ -49,6 +50,9 @@ import requests
 MAX_NUM_SAMPLES = int(os.getenv("NUM_SAMPLES", 1))
 
 routes = Routes()
+
+audio_cache: dict[str, CachedAudio] = {}
+audio_cache_dir = "audio_cache"
 
 
 @routes.http("/v1/health")
@@ -148,6 +152,7 @@ async def tts(req: Annotated[ServeTTSRequest, Body(exclusive=True)]):
             },
             content_type=get_content_type(req.format),
         )
+    
 
 @routes.http.post('/v1/tts/vapi/{voice_id}')
 async def ttsVapi(
@@ -158,18 +163,34 @@ async def ttsVapi(
     print("voice_id", voice_id)
     print("vapi message", req.message)
 
-    print("Fetching Voice")
+    print("Fetching Voice from cache")
 
-    voice = await fetchVoice(voice_id)
-    uri = voice.uri if voice and voice.uri else "https://parrot-samples.s3.amazonaws.com/gargamel/Nigel.wav"
-    reference_text = voice.transcription if voice and voice.transcription else "hey hows it going mate i would love to catch up"  
-    print("downloading audio")
-    response = requests.get(uri)
-    print("downloaded audio")
+
+    cached_voice = audio_cache.get(voice_id)
+
+    if cached_voice is None:
+        print("Audio not in cache fetching from db")
+        voice = await fetchVoice(voice_id)
+        uri = voice.uri if voice and voice.uri else "https://parrot-samples.s3.amazonaws.com/gargamel/Nigel.wav"
+        reference_text = voice.transcription if voice and voice.transcription else "hey hows it going mate i would love to catch up" 
+        filename = uri.split("/")[-1]
+        save_path = os.path.join(audio_cache_dir, filename)
+
+        response = requests.get(uri)
+        response.raise_for_status() 
+
+        with open(save_path, "wb") as f:
+            f.write(response.content)
+
+        audio_cache[voice_id] = CachedAudio(path=save_path, transcription=reference_text)
+        cached_voice = CachedAudio(path=save_path, transcription=reference_text)
+
+    with open(cached_voice.path, "rb") as f:
+        audio_bytes = f.read()
 
     reference_audio = ServeReferenceAudio(
-        audio=response.content,
-        text=reference_text
+        audio=audio_bytes,
+        text=cached_voice.transcription
     )
 
     app_state = request.app.state
@@ -188,6 +209,55 @@ async def ttsVapi(
         },
         content_type="application/octet-stream",
     )
+
+@routes.post('v1/tts/cache/{voice_id}')
+async def cache_audio(
+    voice_id: Annotated[str, Path()]
+):
+    print("Caching audio")
+
+    voice = await fetchVoice(voice_id)
+
+    if voice is None or voice.uri is None:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Voice not found or voice has no audio sample")
+    
+
+    os.makedirs(audio_cache_dir, exist_ok=True)
+
+    response = requests.get(voice.uri)
+    filename = voice.uri.split("/")[-1]
+    save_path = os.path.join(audio_cache_dir, filename)
+
+    response = requests.get(voice.uri)
+    response.raise_for_status() 
+
+    with open(save_path, "wb") as f:
+        f.write(response.content)
+
+    audio_cache[voice_id] = CachedAudio(path=save_path, transcription=voice.transcription)
+    
+    return JSONResponse({"message": "Success"})
+
+@routes.delete("v1/tts/cache/{voice_id}")
+async def delete_cache_audio(
+    voice_id: Annotated[str, Path()]
+):
+    print("Deleting cached audio")
+    audio = audio_cache[voice_id]
+
+    if audio is None:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Audio not in cache")
+    
+    os.remove(audio.path)
+
+    return JSONResponse({"message": "Success"})
+
+
+
+
+
+
+
 
     
 
