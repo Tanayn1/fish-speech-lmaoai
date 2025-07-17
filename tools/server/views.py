@@ -238,7 +238,7 @@ async def cache_audio(
     
     return JSONResponse({"message": "Success"})
 
-@routes.http.delete("/v1/tts/cache/{voice_id}")
+@routes.http.delete("/v1/tts/cache/delete/{voice_id}")
 async def delete_cache_audio(
     voice_id: Annotated[str, Path()]
 ):

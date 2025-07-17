@@ -6,7 +6,10 @@ conn = None
 
 async def connect():
     global conn
-    conn = await asyncpg.connect(os.getenv("DATABASE_URL"))
+    conn = await asyncpg.connect(
+        os.getenv("DATABASE_URL"),
+        statement_cache_size=0
+    )
 
 async def disconnect():
     global conn
