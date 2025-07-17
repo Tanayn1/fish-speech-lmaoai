@@ -210,7 +210,7 @@ async def ttsVapi(
         content_type="application/octet-stream",
     )
 
-@routes.post('v1/tts/cache/{voice_id}')
+@routes.http.post('v1/tts/cache/{voice_id}')
 async def cache_audio(
     voice_id: Annotated[str, Path()]
 ):
@@ -238,7 +238,7 @@ async def cache_audio(
     
     return JSONResponse({"message": "Success"})
 
-@routes.delete("v1/tts/cache/{voice_id}")
+@routes.http.delete("v1/tts/cache/{voice_id}")
 async def delete_cache_audio(
     voice_id: Annotated[str, Path()]
 ):
