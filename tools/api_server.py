@@ -86,7 +86,7 @@ class API(ExceptionHandler):
         app.state.model_manager = ModelManager(
             mode=self.args.mode,
             device=self.args.device,
-            half=self.args.half,
+            half=True,
             compile=True,
             llama_checkpoint_path="checkpoints/openaudio-s1-mini",
             decoder_checkpoint_path="checkpoints/openaudio-s1-mini/codec.pth",
